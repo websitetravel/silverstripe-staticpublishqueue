@@ -1,5 +1,12 @@
 <?php
-class StaticPublishingSiteTreeExtension extends DataExtension {
+/**
+ * This extension couples to the StaticallyPublishable and StaticPublishingTrigger implementations
+ * on the SiteTree objects and makes sure the actual change to SiteTree is triggered/enqueued.
+ *
+ * @see PublishableSiteTree
+ */
+
+class SiteTreePublishingEngine extends DataExtension {
 
 	/**
 	 * Queues the urls to be flushed into the queue.
@@ -41,7 +48,7 @@ class StaticPublishingSiteTreeExtension extends DataExtension {
 
 			$toUpdate = $this->owner->objectsToUpdate($context);
 
-			foreach ($toUpdate as $object) {
+			if ($toUpdate) foreach ($toUpdate as $object) {
 				if (!is_callable(array($this->owner, 'urlsToCache'))) continue;
 
 				$urls = $object->urlsToCache();
@@ -58,7 +65,7 @@ class StaticPublishingSiteTreeExtension extends DataExtension {
 		if (is_callable(array($this->owner, 'objectsToDelete'))) {
 
 			$toDelete = $this->owner->objectsToDelete($context);
-			foreach ($toDelete as $object) {
+			if ($toDelete) foreach ($toDelete as $object) {
 				if (!is_callable(array($this->owner, 'urlsToCache'))) continue;
 
 				$urls = $object->urlsToCache();
@@ -84,7 +91,7 @@ class StaticPublishingSiteTreeExtension extends DataExtension {
 		}
 
 		if(!empty($this->toDelete)) {
-			singleton("SiteTree")->unpublishPagesAndStaleCopies($this->toDelete);
+			$this->unpublishPagesAndStaleCopies($this->toDelete);
 			$this->toDelete = array();
 		}
 	}
@@ -92,10 +99,13 @@ class StaticPublishingSiteTreeExtension extends DataExtension {
 	/**
 	 * Removes the unpublished page's static cache file as well as its 'stale.html' copy.
 	 * Copied from: FilesystemPublisher->unpublishPages($urls)
+	 *
+	 * TODO: doesn't work for subsites - does not respect domain_based_caching.
+	 *
+	 * @param $urls array associative array of url => priority
 	 */
 	public function unpublishPagesAndStaleCopies($urls) {
-		// Detect a numerically indexed arrays
-		if (is_numeric(join('', array_keys($urls)))) $urls = $this->owner->urlsToPaths($urls);
+		$urls = $this->owner->urlsToPaths(array_keys($urls));
 
 		$cacheBaseDir = $this->owner->getDestDir();
 
