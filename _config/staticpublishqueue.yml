@@ -6,6 +6,7 @@ SiteTree:
   extensions:
     - StaticPublishingSiteTreeExtension
     - FilesystemPublisher('cache', 'html')
+    - PublishableSiteTree
 StaticPublisher:
   include_caching_metadata: true
   disable_realtime: true
