@@ -3,6 +3,9 @@
  * This extension couples to the StaticallyPublishable and StaticPublishingTrigger implementations
  * on the SiteTree objects and makes sure the actual change to SiteTree is triggered/enqueued.
  *
+ * Provides the following information as a context to StaticPublishingTrigger:
+ * * action - name of the executed action: publish or unpublish
+ *
  * @see PublishableSiteTree
  */
 
