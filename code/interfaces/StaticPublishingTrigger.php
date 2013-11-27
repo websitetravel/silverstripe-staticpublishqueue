@@ -12,7 +12,7 @@ interface StaticPublishingTrigger {
 	 *
 	 * @param $context An associative array with information on the action.
 	 *
-	 * @return DataList of Page.
+	 * @return SS_List
 	 */
 	public function objectsToUpdate($context);
 
@@ -21,7 +21,7 @@ interface StaticPublishingTrigger {
 	 *
 	 * @param $context An associative array with information on the action.
 	 *
-	 * @return DataList of Page.
+	 * @return SS_List
 	 */
 	public function objectsToDelete($context);
 
