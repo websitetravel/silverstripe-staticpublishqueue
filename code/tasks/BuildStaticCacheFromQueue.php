@@ -192,7 +192,14 @@ class BuildStaticCacheFromQueue extends BuildTask {
 					// Subsite page. Generate all domain variants registered with the subsite.
 					Config::inst()->update('FilesystemPublisher', 'static_publisher_theme', $subsite->Theme);
 
+                    $onlyPublishPrimaryDomains = Config::inst()->get('StaticPagesQueue', 'publish_primary_domains_only');
+
 					foreach($subsite->Domains() as $domain) {
+
+                        if ($onlyPublishPrimaryDomains && !$domain->IsPrimary) {
+                            continue;
+                        }
+
 						Config::inst()->update(
 							'FilesystemPublisher',
 							'static_base_url',
