@@ -1,16 +1,14 @@
 <?php
 /**
  * This tasks takes care of republishing pages that has been queues in the StaticPagesQueue.
- *
- * * Only one instance of this script can be run at a time. The script will take
+ * 
+ * Only one instace of this script can be run at a time. The script will take
  * lock on pidfile at <silverstripe-cache>/pid.buildstaticcachefromqueue.txt.
  *
- * First there are the $this->anotherInstanceRunning(30) that checks if a process haven't updated the
  * The script has a timer that makes sure the script in daemon mode will run
- * pidfile in 30 seconds, then we declare it as dead and force execute.
  * only for 590 sec and terminate. This is to make sure that the script doesn't
  * hog up to much resources and also if we do a deploy or so.
- *
+ * 
  * At can be run in browser, from command line as:
  * /dev/tasks/BuildStaticCacheFromQueue
  *
@@ -95,12 +93,12 @@ class BuildStaticCacheFromQueue extends BuildTask {
 				$this->verbose = true;
 			}
 
-            // Get lock, based on http://stackoverflow.com/a/24665209/359059
+			// Get lock, based on http://stackoverflow.com/a/24665209/359059
 			$lock_file = fopen($this->getPidFilePath(), 'c');
 			$got_lock = flock($lock_file, LOCK_EX | LOCK_NB, $wouldblock);
 			if ($lock_file === false || (!$got_lock && !$wouldblock)) {
 				throw new Exception(
-				"Unexpected error opening or locking lock file. Perhaps you " .
+					"Unexpected error opening or locking lock file. Perhaps you " .
 					"don't  have permission to write to the lock file or its " .
 					"containing directory?"
 				);
@@ -108,9 +106,9 @@ class BuildStaticCacheFromQueue extends BuildTask {
 				if ($this->verbose) {
 					$pid = (int)trim(file_get_contents($this->getPidFilePath()));
 					echo "Another instance is already running ($pid); terminating.\n";
- 				}
-                return false;
- 			}
+				}
+				return false;
+			}
 
 			// Lock acquired; let's write our PID to the lock file for the convenience
 			// of humans who may wish to terminate the script.
