@@ -5,3 +5,6 @@ After: 'framework/*','cms/*'
 FilesystemPublisher:
   include_caching_metadata: true
   disable_realtime: true
+
+StaticPagesQueue:
+  publish_primary_domains_only: true

@@ -189,7 +189,13 @@ class SiteTreePublishingEngine extends DataExtension {
 					$pathMap = array_merge($pathMap, $this->owner->urlsToPaths(array($staticBaseUrl . '/' . $cleanUrl)));
 				} else {
 					// Subsite page. Generate all domain variants registered with the subsite.
-					foreach($subsite->Domains() as $domain) {
+                    $onlyPublishPrimaryDomains = Config::inst()->get('StaticPagesQueue', 'publish_primary_domains_only');
+
+                    foreach($subsite->Domains() as $domain) {
+                        if ($onlyPublishPrimaryDomains && !$domain->IsPrimary) {
+                            continue;
+                        }
+
 						$pathMap = array_merge($pathMap, $this->owner->urlsToPaths(
 							array('http://'.$domain->Domain . $director::baseURL() . $cleanUrl)
 						));

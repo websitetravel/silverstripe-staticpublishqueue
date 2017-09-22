@@ -4,7 +4,7 @@
  * 
  * Only one instace of this script can be run at a time. The script will take
  * lock on pidfile at <silverstripe-cache>/pid.buildstaticcachefromqueue.txt.
- * 
+ *
  * The script has a timer that makes sure the script in daemon mode will run
  * only for 590 sec and terminate. This is to make sure that the script doesn't
  * hog up to much resources and also if we do a deploy or so.
@@ -208,7 +208,14 @@ class BuildStaticCacheFromQueue extends BuildTask {
 					// Subsite page. Generate all domain variants registered with the subsite.
 					Config::inst()->update('FilesystemPublisher', 'static_publisher_theme', $subsite->Theme);
 
+                    $onlyPublishPrimaryDomains = Config::inst()->get('StaticPagesQueue', 'publish_primary_domains_only');
+
 					foreach($subsite->Domains() as $domain) {
+
+                        if ($onlyPublishPrimaryDomains && !$domain->IsPrimary) {
+                            continue;
+                        }
+
 						Config::inst()->update(
 							'FilesystemPublisher',
 							'static_base_url',
