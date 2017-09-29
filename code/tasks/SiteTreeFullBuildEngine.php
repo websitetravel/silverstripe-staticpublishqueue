@@ -86,7 +86,6 @@ class SiteTreeFullBuildEngine extends BuildTask {
 		}
 	}
 
-
 	/**
 	 * Process a chunk of pages
 	 * @param $start
