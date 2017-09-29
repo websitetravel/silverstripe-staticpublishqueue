@@ -1,6 +1,6 @@
 <?php
 /**
- * Bare-bones impelmentation of a publishable page.
+ * Bare-bones implementation of a publishable page.
  *
  * You can override this either by implementing one of the interfaces the class directly, or by applying
  * an extension via the config system ordering (inject your extension "before" the PublishableSiteTree).
@@ -12,51 +12,54 @@
 
 class PublishableSiteTree extends DataExtension implements StaticallyPublishable, StaticPublishingTrigger {
 
-	public function getMyVirtualPages() {
+	public function getMyVirtualPages()
+    {
 		return VirtualPage::get()->filter(array('CopyContentFromID' => $this->owner->ID));
 	}
 
-	public function objectsToUpdate($context) {
+	public function objectsToUpdate($context)
+    {
+		switch ($context[PublishingEngine::CONTEXT_ACTION]) {
 
-		switch ($context['action']) {
+			case PublishingEngine::CONTEXT_ACTION_PUBLISH: {
+                // Trigger refresh of the page itself.
+                $list = new ArrayList(array($this->owner));
 
-			case 'publish':
-				// Trigger refresh of the page itself.
-				$list = new ArrayList(array($this->owner));
+                // Refresh the parent.
+                if ($this->owner->ParentID) $list->push($this->owner->Parent());
 
-				// Refresh the parent.
-				if ($this->owner->ParentID) $list->push($this->owner->Parent());
+                // Refresh related virtual pages.
+                $virtuals = $this->owner->getMyVirtualPages();
+                if ($virtuals->count() > 0) {
+                    foreach ($virtuals as $virtual) {
+                        $list->push($virtual);
+                    }
+                }
 
-				// Refresh related virtual pages.
-				$virtuals = $this->owner->getMyVirtualPages();
-				if ($virtuals->count()>0) {
-					foreach ($virtuals as $virtual) {
-						$list->push($virtual);
-					}
-				}
+                return $list;
+            }
+			case PublishingEngine::CONTEXT_ACTION_UNPUBLISH: {
+                $list = new ArrayList([]);
 
-				return $list;
+                // Refresh the parent
+                if ($this->owner->ParentID) {
+                    $list->push($this->owner->Parent());
+                }
 
-			case 'unpublish':
-				$list = new ArrayList(array());
-
-				// Refresh the parent
-				if ($this->owner->ParentID) $list->push($this->owner->Parent());
-
-				return $list;
-
+                return $list;
+            }
 		}
 
 	}
 
-	public function objectsToDelete($context) {
+	public function objectsToDelete($context)
+    {
+		switch ($context[PublishingEngine::CONTEXT_ACTION]) {
 
-		switch ($context['action']) {
+			case PublishingEngine::CONTEXT_ACTION_PUBLISH:
+				return new ArrayList([]);
 
-			case 'publish':
-				return new ArrayList(array());
-
-			case 'unpublish':
+			case PublishingEngine::CONTEXT_ACTION_UNPUBLISH:
 				// Trigger cache removal for this page.
 				$list = new ArrayList(array($this->owner));
 
@@ -80,6 +83,5 @@ class PublishableSiteTree extends DataExtension implements StaticallyPublishable
 	public function urlsToCache() {
 		return array($this->owner->Link() => 0);
 	}
-
 }
 

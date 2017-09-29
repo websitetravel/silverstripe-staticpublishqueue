@@ -180,11 +180,7 @@ class BuildStaticCacheFromQueue extends BuildTask {
 		foreach($URLSegments as $index => $url) {
 			$obj = $this->getUrlArrayObject()->getObject($url);
 
-			if (!$obj || !$obj->hasExtension('SiteTreeSubsites')) {
-				// No metadata available. Pass it straight on.
-				$results = singleton("SiteTree")->publishPages(array($url));
-
-			} else {
+			if ($obj && ($obj->hasExtension('SiteTreeSubsites') || (is_callable([$obj, 'Subsite']) && $obj->Subsite()))) {
 				Config::inst()->nest();
 
 				// Subsite page requested. Change behaviour to publish into directory.
@@ -194,7 +190,8 @@ class BuildStaticCacheFromQueue extends BuildTask {
 				if (strpos($url, '/')===0) $cleanUrl = Director::makeRelative($url);
 				else $cleanUrl = Director::makeRelative('/' . $url);
 
-				$subsite = $obj->Subsite();
+                $subsite = $obj->Subsite();
+
 				if (!$subsite || !$subsite->ID) {
 					// Main site page - but publishing into subdirectory.
 					$staticBaseUrl = Config::inst()->get('FilesystemPublisher', 'static_base_url');
@@ -230,7 +227,10 @@ class BuildStaticCacheFromQueue extends BuildTask {
 				}
 
 				Config::inst()->unnest();
-			}
+			} else {
+                // No metadata available. Pass it straight on.
+                $results = singleton("SiteTree")->publishPages(array($url));
+            }
 		}
 
 		// Create or remove stale file

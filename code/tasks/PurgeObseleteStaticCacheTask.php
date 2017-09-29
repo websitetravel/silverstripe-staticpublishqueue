@@ -28,7 +28,7 @@ class PurgeObseleteStaticCacheTask extends BuildTask {
 		Versioned::reading_stage('Live');
 
 		foreach(Config::inst()->get('SiteTree', 'extensions') as $extension) {
-			if(preg_match('/FilesystemPublisher\(\'(\w+)\',\s?\'(\w+)\'\)/', $extension, $matches)) {
+			if(preg_match('/FilesystemPublisher\(\'([\w\/]+)\',\s?\'(\w+)\'\)/', $extension, $matches)) {
 				$directory = BASE_PATH . '/' . $matches[1];
 				$fileext = $matches[2];
 				break;
@@ -38,20 +38,7 @@ class PurgeObseleteStaticCacheTask extends BuildTask {
 		if(!isset($directory, $fileext)) die('FilesystemPublisher configuration not found.');
 
 		// Get list of cacheable pages in the live SiteTree
-		$pages = singleton('Page')->allPagesToCache();
-		foreach($pages as $page_link) {
-			$page = SiteTree::get_by_link($page_link);
-			if($page && $page->getLiveURLSegment()) {
-				if($subpages = $page->subPagesToCache()) {
-					$pages = array_merge($pages, $subpages);
-					unset($subpages);
-				}
-				if($affectedpages = $page->pagesAffected()) {
-					$pages = array_merge($pages, $affectedpages);
-					unset($affectedpages);
-				}
-			}
-		}
+		$pages = $this->getAllLivePages();
 
 		// Get array of custom exclusion regexes from Config system
 		$excludes = $this->config()->get('exclude');
@@ -116,9 +103,24 @@ class PurgeObseleteStaticCacheTask extends BuildTask {
 		echo sprintf("PurgeObseleteStaticCacheTask: Deleting %d obselete pages from cache\n", count($removeURLs));
 
 		// Remove current and stale cache files
-		singleton('SiteTree')->unpublishPagesAndStaleCopies($removeURLs);
+	//	singleton('SiteTree')->deleteRegularFiles($removeURLs);
 
 		Versioned::set_reading_mode($oldMode);
 	}
+
+    protected function getAllLivePages() {
+        ini_set('memory_limit', '512M');
+        $oldMode = Versioned::get_reading_mode();
+        if(class_exists('Subsite')) {
+            Subsite::disable_subsite_filter(true);
+        }
+        if(class_exists('Translatable')) {
+            Translatable::disable_locale_filter();
+        }
+        Versioned::reading_stage('Live');
+        $pages = DataObject::get("SiteTree");
+        Versioned::set_reading_mode($oldMode);
+        return $pages;
+    }
 
 }
