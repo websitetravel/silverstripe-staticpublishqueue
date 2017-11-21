@@ -210,6 +210,8 @@ class FilesystemPublisher extends DataExtension {
 		    if (isset($_SERVER['HTTPS'])) {
 		        $url = str_replace('http://', 'https://', $url);
 		        echo "test"."\n";
+            } else {
+		        echo "whatever"."\n";
             }
 			$origUrl = $url;
 			$result[$origUrl] = array(
