@@ -207,12 +207,7 @@ class FilesystemPublisher extends DataExtension {
 		$totalURLs = sizeof($urls);
 
 		foreach($urls as $url => $path) {
-		    if (isset($_SERVER['HTTPS'])) {
-		        $url = str_replace('http://', 'https://', $url);
-		        echo "test"."\n";
-            } else {
-		        echo "whatever"."\n";
-            }
+            $url = str_replace('http://', 'https://', $url);
 			$origUrl = $url;
 			$result[$origUrl] = array(
 				'statuscode' => null, 
