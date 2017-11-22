@@ -150,7 +150,7 @@ class FilesystemPublisher extends DataExtension {
 				if (isset($urlParts['host'])) $filename = $urlParts['host'] . '/' . $filename;
 			}
 		
-			$mappedUrls[$url] = ((dirname($filename) == '/') ? '' :  (dirname($filename).'/')).basename($filename);
+			$mappedUrls[$url] = 'https://'. ((dirname($filename) == '/') ? '' :  (dirname($filename).'/')).basename($filename);
 		}
 
 		return $mappedUrls;
