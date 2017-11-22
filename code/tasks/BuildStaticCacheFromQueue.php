@@ -216,11 +216,11 @@ class BuildStaticCacheFromQueue extends BuildTask {
 						Config::inst()->update(
 							'FilesystemPublisher',
 							'static_base_url',
-							'http://'.$domain->Domain . Director::baseURL()
+							'https://'.$domain->Domain . Director::baseURL()
 						);
 
 						$result = singleton("SiteTree")->publishPages(
-							array('http://'.$domain->Domain . Director::baseURL() . $cleanUrl)
+							array('https://'.$domain->Domain . Director::baseURL() . $cleanUrl)
 						);
 						$results = array_merge($results, $result);
 					}

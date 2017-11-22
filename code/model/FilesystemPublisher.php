@@ -207,7 +207,7 @@ class FilesystemPublisher extends DataExtension {
 		$totalURLs = sizeof($urls);
 
 		foreach($urls as $url => $path) {
-            $url = str_replace('http://', 'https://', $url);
+            //$url = str_replace('http://', 'https://', $url);
 			$origUrl = $url;
 			$result[$origUrl] = array(
 				'statuscode' => null, 
