@@ -173,7 +173,7 @@ class PublishingEngine extends DataExtension
                         }
 
                         $pathMap = array_merge($pathMap, $this->owner->urlsToPaths(
-                            ['http://'.$domain->Domain . $director::baseURL() . $cleanUrl]
+                            ['https://'.$domain->Domain . $director::baseURL() . $cleanUrl]
                         ));
                     }
                 }
