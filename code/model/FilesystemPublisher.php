@@ -150,7 +150,7 @@ class FilesystemPublisher extends DataExtension {
 				if (isset($urlParts['host'])) $filename = $urlParts['host'] . '/' . $filename;
 			}
 		
-			$mappedUrls[$url] = ((dirname($filename) == '/') ? '' :  (dirname($filename).'/')).basename($filename);
+			$mappedUrls[$url] = 'https://'. ((dirname($filename) == '/') ? '' :  (dirname($filename).'/')).basename($filename);
 		}
 
 		return $mappedUrls;
@@ -207,6 +207,7 @@ class FilesystemPublisher extends DataExtension {
 		$totalURLs = sizeof($urls);
 
 		foreach($urls as $url => $path) {
+            //$url = str_replace('http://', 'https://', $url);
 			$origUrl = $url;
 			$result[$origUrl] = array(
 				'statuscode' => null, 
@@ -231,8 +232,10 @@ class FilesystemPublisher extends DataExtension {
 			if($url == "") $url = "/";
 			if(Director::is_relative_url($url)) $url = Director::absoluteURL($url);
 			$sanitizedURL = URLArrayObject::sanitize_url($url);
+			echo "Url : " . $sanitizedURL . "\n";
 			$response = Director::test(str_replace('+', ' ', $sanitizedURL));
-
+			echo "Status : ".$response->getStatusCode()."\n";
+            flush();
 			if($response) {
 				$result[$origUrl]['statuscode'] = $response->getStatusCode();
 			}
